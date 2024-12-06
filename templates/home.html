@@ -5,12 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
 </head>
 
 <body>
-    {% for book, author in books %}
-    <p>{{ book.title}} by {{ author.name }}</p>
-    {% endfor %}
+    <a href="/add_author"><button>ADD AUTHOR</button></a>
+    <a href="/add_book"><button>ADD BOOK</button></a>
+    <h1>Books</h1>
+    <div class="filter">
+        <form class="sort" action="/" method="get">
+            <label for="sort">Sort by</label>
+            <select name="sort" id="sort">
+                <option value="title">Tile</option>
+                <option value="author">Author</option>
+                <option value="publication_year">Publish Date</option>
+            </select>
+            <input type="submit" value="Apply">
+        </form>
+    </div>
+
+
+    <div class="books">
+        {% for book in books %}
+        <div class="container book">
+            <h2>{{ book.title}}</h2>
+            <p class="author">Author: {{ book.author.name }}</p>
+            <p class="isbn">ISBN: {{ book.isbn}}</p>
+            <p class="publication_year">Publish Date: {{ book.publication_year}}</p>
+            <img src="{{ book.cover_url }}" alt="Book Cover: {{ book.title }}">
+        </div>
+        {% endfor %}
+    </div>
+
+
 </body>
 
 </html>

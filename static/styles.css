@@ -1,0 +1,102 @@
+/* Custom CSS Reset
+based on Josh Comeau's CSS Reset: https://www.joshwcomeau.com/css/custom-css-reset/
+and Andy Bell's Modern CSS Reset: https://piccalil.li/blog/a-more-modern-css-reset/ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+/* -webkit... only for Safari and MacOS with retina display */
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* makes sure to use same font-family, font-size and font-weight for all elements */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+:root {
+  --clr-1: #d3f1df;
+  --clr-2: #85a98f;
+  --clr-3: #5a6c57;
+  --clr-4: #525b44;
+}
+
+body {
+  font-family: "Helvetica Neue", sans-serif;
+  padding: 2rem;
+  background-color: rgb(99, 99, 99);
+}
+
+.container {
+  background-color: white;
+  padding: 2rem;
+  margin: auto;
+  max-width: 30rem;
+  border-radius: 1rem;
+  box-shadow: 0px 0px 8px rgb(0, 0, 0);
+}
+
+.books {
+  display: grid;
+  grid-template-rows: 20rem;
+  grid-auto-rows: 20rem;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  gap: 10px;
+}
+.book {
+  margin: 0;
+  margin-bottom: 2rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--clr-4);
+}
+.sort {
+  max-width: 10rem;
+}
+
+input,
+select {
+  border: 2px solid grey;
+  border-radius: 0.2rem;
+  padding-inline: 0.5rem;
+  padding-block: 0.2rem;
+  margin-block-end: 1.2rem;
+  color: var(--clr-4);
+}
+
+input[type="submit"] {
+  background-color: var(--clr-2);
+  color: white;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: var(--clr-1);
+  color: var(--clr-4);
+}

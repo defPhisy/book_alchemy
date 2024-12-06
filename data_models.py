@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 # from datetime import datetime
 
 db = SQLAlchemy()
@@ -9,18 +9,18 @@ db = SQLAlchemy()
 class Author(db.Model):
     __tablename__ = "authors"
 
-    author_id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True
-    )
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str]
     birth_date: Mapped[str]
     date_of_death: Mapped[str]
 
+    books = relationship("Book", back_populates="author")
+
     def __repr__(self):
-        return f"Author({self.author_id}, {self.name})"
+        return f"Author({self.id}, {self.name})"
 
     def __str__(self):
-        return f"Author: {self.name} ID: {self.author_id} Birthday: {self.birth_date} Death: {self.date_of_death}"
+        return f"Author: {self.name} ID: {self.id} Birthday: {self.birth_date} Death: {self.date_of_death}"
 
 
 class Book(db.Model):
@@ -29,11 +29,17 @@ class Book(db.Model):
     book_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     isbn: Mapped[str] = mapped_column(unique=True)
     title: Mapped[str]
-    publication_year: Mapped[int]
-    author_id: Mapped[int] = mapped_column(ForeignKey("authors.author_id"))
+    publication_year: Mapped[str]
+    author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
+    cover_url: Mapped[str]
+
+    author = relationship("Author", back_populates="books")
 
     def __repr__(self):
-        return f"Book({self.title})"
+        return f"<Book(id={self.book_id}, title='{self.title}')>"
 
     def __str__(self):
-        return f"ID: {self.book_id} Book: {self.title} Year: {self.publication_year} ISBN: {self.isbn}"
+        return (
+            f"Book ID: {self.book_id}, Title: {self.title}, "
+            f"Year: {self.publication_year}, ISBN: {self.isbn}"
+        )
