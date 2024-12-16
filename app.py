@@ -1,7 +1,11 @@
-from flask import Flask, render_template, request, flash
-from data_models import db, Book, Author
 import os
+import typing
 from datetime import datetime
+from typing import List, Union
+
+from data_models import Author, Book, db
+from dummy_data import populate_dummy_data
+from flask import Flask, flash, render_template, request
 
 ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 DB_FOLDER = "./data"
@@ -15,17 +19,30 @@ app.config.from_mapping(
 )
 db.init_app(app)
 
-# create db tables based on data_models , called only once for table creation
-with app.app_context():
-    db.create_all()
+# create db tables based on data_models , called only once for table creation or database got cancelled
+if not os.path.exists(FULL_DB_PATH):
+    with app.app_context():
+        db.create_all()
+
+        # insert dummy data once
+        populate_dummy_data()
 
 
 @app.route("/")
-def index():
+def index() -> str:
+    """
+    The home page route for the application.
+
+    This function handles sorting and searching books in the library.
+    Displays the list of books along with the total count of books.
+
+    :return: Rendered HTML template for the home page.
+    :rtype: str
+    """
     sort = Book.title  # default sorting
 
     if "sort" in request.args:
-        sort = request.args["sort"]
+        sort: str = request.args["sort"]
     books = db_get_books(sort)
 
     if "search" in request.args:
@@ -43,7 +60,16 @@ def index():
 
 
 @app.route("/add_author", methods=["GET", "POST"])
-def add_author():
+def add_author() -> str:
+    """
+    The route to add a new author.
+
+    Handles both GET and POST requests. For GET, it renders the author
+    addition form. For POST, it adds a new author to the database.
+
+    :return: Rendered HTML template for adding an author or confirmation message.
+    :rtype: str
+    """
     if request.method == "POST":
         new_author = db_add_author(request.form)
         return render_template("message.html", item=new_author)
@@ -52,7 +78,16 @@ def add_author():
 
 
 @app.route("/add_book", methods=["GET", "POST"])
-def add_book():
+def add_book() -> str:
+    """
+    The route to add a new book.
+
+    Handles both GET and POST requests. For GET, it renders the book
+    addition form. For POST, it adds a new book to the database.
+
+    :return: Rendered HTML template for adding a book or confirmation message.
+    :rtype: str
+    """
     if request.method == "POST":
         new_book = db_add_book(request.form)
         return render_template("message.html", item=new_book)
@@ -66,7 +101,18 @@ def add_book():
 
 
 @app.route("/book/<int:book_id>/delete", methods=["GET"])
-def delete_book(book_id):
+def delete_book(book_id: int) -> Union[str, tuple[str, int]]:
+    """
+    The route to delete a book by its ID.
+
+    Fetches the book from the database by its ID, deletes it if found,
+    and renders a confirmation page.
+
+    :param book_id: The ID of the book to delete.
+    :type book_id: int
+    :return: Rendered HTML template for deletion confirmation or error page.
+    :rtype: str or tuple[str, int]
+    """
     book = db.session.execute(
         db.select(Book).where(Book.book_id == book_id)
     ).scalar_one_or_none()
@@ -80,7 +126,15 @@ def delete_book(book_id):
     return render_template("delete_book.html", book=book)
 
 
-def db_get_books(sort):
+def db_get_books(sort: str) -> List[Book]:
+    """
+    Fetches and sorts books from the database based on the given sort parameter.
+
+    :param sort: The field to sort by (e.g., 'title', 'author', etc.).
+    :type sort: str
+    :return: A list of books sorted by the specified field.
+    :rtype: List[Book]
+    """
     sort_options = {
         "title": Book.title,
         "author": Author.name,
@@ -90,36 +144,73 @@ def db_get_books(sort):
 
     sort_by = sort_options.get(sort, Book.title)
     if sort == "rating":
-        return (
-            db.session.execute(
-                db.select(Book).join(Book.author).order_by(sort_by.desc())
+        result = (
+            (
+                db.session.execute(
+                    db.select(Book).join(Book.author).order_by(sort_by.desc())
+                )
             )
-        ).scalars()
+            .scalars()
+            .all()
+        )
+    else:
+        result = (
+            (
+                db.session.execute(
+                    db.select(Book).join(Book.author).order_by(sort_by)
+                )
+            )
+            .scalars()
+            .all()
+        )
+    return typing.cast(List[Book], result)
 
-    return (
-        db.session.execute(db.select(Book).join(Book.author).order_by(sort_by))
-    ).scalars()
 
+def db_search_books(search: str) -> List[Book]:
+    """
+    Searches for books by title using a case-insensitive substring match.
 
-def db_search_books(search):
+    :param search: The search term to look for in book titles.
+    :type search: str
+    :return: A list of books matching the search term.
+    :rtype: List[Book]
+    """
     search = f"%{search.lower()}%"
-    return (
+    result = (
         (db.session.execute(db.select(Book).where(Book.title.like(search))))
         .scalars()
         .all()
     )
+    return typing.cast(List[Book], result)
 
 
-def db_get_authors():
-    return db.session.execute(
-        db.select(Author).order_by(Author.name)
-    ).scalars()
+def db_get_authors() -> List[Author]:
+    """
+    Fetches all authors from the database, sorted alphabetically by name.
+
+    :return: A list of all authors.
+    :rtype: List[Author]
+    """
+    result = (
+        db.session.execute(db.select(Author).order_by(Author.name))
+        .scalars()
+        .all()
+    )
+    return typing.cast(List[Author], result)
 
 
-def db_add_author(request) -> Author:
-    name: str = request.get("name")
-    birth_date: str = request.get("birthdate")
-    death_date: str = request.get("date_of_death")
+def db_add_author(request: dict) -> Author:
+    """
+    Adds a new author to the database.
+
+    :param request: A dictionary containing author details ('name', 'birthdate', etc.).
+    :type request: dict
+    :return: The newly added Author object.
+    :rtype: Author
+    """
+    name: str = request.get("name", None)
+    birth_date: str = request.get("birthdate", None)
+    death_date: str = request.get("date_of_death", None)
     new_author = Author(
         name=name,  # type: ignore
         birth_date=birth_date,  # type: ignore
@@ -133,6 +224,15 @@ def db_add_author(request) -> Author:
 
 
 def db_add_book(request) -> Book:
+    """
+    Adds a new book to the database.
+
+    :param request: A dictionary containing book details ('title', 'isbn', etc.).
+    :type request: dict
+    :return: The newly added Book object.
+    :rtype: Book
+    :raises ValueError: If the specified author does not exist in the database.
+    """
     title: str = request.get("title")
     isbn: str = request.get("isbn")
     author_id: str = request.get("author")

@@ -1,6 +1,9 @@
+from typing import Optional
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 # from datetime import datetime
 
 db = SQLAlchemy()
@@ -12,7 +15,7 @@ class Author(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str]
     birth_date: Mapped[str]
-    date_of_death: Mapped[str]
+    date_of_death: Mapped[Optional[str]]
 
     books = relationship("Book", back_populates="author")
 
@@ -47,10 +50,13 @@ class Book(db.Model):
         )
 
     @classmethod
-    def count_books(cls, session):
+    def count_books(cls, session) -> int:
         """
         Returns the total number of books in the database.
+
         :param session: The SQLAlchemy session to query the database.
+        :type session: sqlalchemy.orm.Session
         :return: Integer count of books.
+        :rtype: int
         """
         return session.query(cls).count()
