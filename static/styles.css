@@ -13,11 +13,6 @@ and Andy Bell's Modern CSS Reset: https://piccalil.li/blog/a-more-modern-css-res
 }
 
 /* -webkit... only for Safari and MacOS with retina display */
-body {
-  min-height: 100vh;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
 
 img,
 picture,
@@ -41,12 +36,87 @@ select {
   --clr-2: #85a98f;
   --clr-3: #5a6c57;
   --clr-4: #525b44;
+  --clr-5: #262626;
+}
+.checked {
+  color: orange;
+}
+
+.separator {
+  background-color: var(--clr-3);
+  height: 2rem;
+  width: 2px;
 }
 
 body {
   font-family: "Helvetica Neue", sans-serif;
-  padding: 2rem;
-  background-color: rgb(99, 99, 99);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.back_button {
+  font-size: 5rem;
+  padding: 0.5rem;
+}
+
+h1 {
+  text-align: center;
+  font-size: 5rem;
+  font-weight: 900;
+  background: -webkit-linear-gradient(
+    135deg,
+    var(--clr-2),
+    var(--clr-1),
+    var(--clr-3)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-block-end: 0;
+}
+
+.title {
+  font-size: 8rem;
+  background: -webkit-linear-gradient(
+    135deg,
+    var(--clr-1),
+    var(--clr-2),
+    var(--clr-4),
+    var(--clr-1),
+    var(--clr-3),
+    var(--clr-1)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtext {
+  color: var(--clr-2);
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 500;
+  margin-block-start: -2.5rem;
+  margin-block-end: 4rem;
+}
+
+.sort {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  max-width: 25rem;
+}
+
+main {
+  padding-block: 3rem;
 }
 
 .container {
@@ -55,19 +125,104 @@ body {
   margin: auto;
   max-width: 30rem;
   border-radius: 1rem;
-  box-shadow: 0px 0px 8px rgb(0, 0, 0);
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.369);
 }
 
 .books {
   display: grid;
-  grid-template-rows: 20rem;
-  grid-auto-rows: 20rem;
-  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
-  gap: 10px;
+  grid-template-rows: repeat(auto-fit);
+  grid-template-columns: repeat(auto-fit, 20rem);
+  justify-content: center;
+  gap: 2rem;
 }
+
 .book {
-  margin: 0;
-  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.731);
+  height: 572px;
+
+  .image-container {
+    width: 100%;
+    height: 24rem;
+    overflow: hidden;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    .delete_book {
+      display: grid;
+      -ms-grid-row-align: center;
+      width: 2rem;
+      height: 2rem;
+    }
+
+    h2 {
+      color: var(--clr-5);
+    }
+    .delete_book:hover {
+      background-color: red;
+      color: white !important;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltip_text {
+      visibility: hidden;
+      width: 120px;
+      background-color: red;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
+
+      /* Position the tooltip */
+      position: absolute;
+      z-index: 1;
+      bottom: 150%;
+      left: 50%;
+      margin-left: -60px;
+    }
+
+    .tooltip .tooltip_text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: red transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltip_text {
+      visibility: visible;
+    }
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    height: 188px;
+  }
+
+  .rating {
+    font-size: 1.5rem;
+    text-align: center;
+  }
 }
 
 form {
@@ -75,9 +230,6 @@ form {
   flex-direction: column;
   gap: 0.2rem;
   color: var(--clr-4);
-}
-.sort {
-  max-width: 10rem;
 }
 
 input,
@@ -90,13 +242,36 @@ select {
   color: var(--clr-4);
 }
 
-input[type="submit"] {
+input[type="submit"],
+button,
+.sort > select {
+  padding-inline: 0.5rem;
+  padding-block: 0.2rem;
   background-color: var(--clr-2);
   color: white;
+  font-weight: 900;
   cursor: pointer;
+  border: none;
+  border-radius: 0.2rem;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover,
+button:hover,
+.sort > select:hover {
   background-color: var(--clr-1);
   color: var(--clr-4);
+}
+.sort > input,
+.sort > select {
+  margin: 0;
+}
+
+.noise3 {
+  background: #024916;
+  background-image: url("data:image/svg+xml,%3C!-- svg: first layer --%3E%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.background-overlay {
+  background: linear-gradient(180deg, #03160bae, #151a17 75%);
+  min-height: 100vh;
 }

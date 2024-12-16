@@ -6,38 +6,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+    <script src="https://kit.fontawesome.com/f26c72a963.js" crossorigin="anonymous"></script>
 </head>
 
-<body>
-    <a href="/add_author"><button>ADD AUTHOR</button></a>
-    <a href="/add_book"><button>ADD BOOK</button></a>
-    <h1>Books</h1>
-    <div class="filter">
-        <form class="sort" action="/" method="get">
-            <label for="sort">Sort by</label>
-            <select name="sort" id="sort">
-                <option value="title">Tile</option>
-                <option value="author">Author</option>
-                <option value="publication_year">Publish Date</option>
-            </select>
-            <input type="submit" value="Apply">
-        </form>
+<body class="noise3">
+    <div class="background-overlay">
+
+        <h1><span class="title">Books</span></h1>
+        <p class="subtext">You have {{ book_count }} books in your library.</p>
+        <nav>
+            <form class="sort" action="/" method="get">
+                <select name="sort" id="sort">
+                    <option value="">Filter Books</option>
+                    <option value="title">Title</option>
+                    <option value="author">Author</option>
+                    <option value="rating">Rating</option>
+                    <option value="publication_year">Publish Year</option>
+                </select>
+                <button type="submit"><i class="fa-solid fa-filter"></i> Apply Filter</button>
+            </form>
+            <div class="separator"></div>
+            <a href="/add_author"><button><i class="fa-solid fa-plus"></i> Add Author</button></a>
+            <a href="/add_book"><button><i class="fa-solid fa-plus"></i> Add Book</button></a>
+        </nav>
+        <main>
+            <div class="books">
+                {% for book in books %}
+                <div class="book">
+                    <div class="image-container"><img src="{{ book.img_url }}" alt="Book Cover" width="256px"
+                            height="300px"></div>
+                    <div class="info">
+                        <div class="header">
+                            <h2>{{ book.title}}</h2>
+                            <div class="tooltip"><a href="/book/{{ book.book_id }}/delete"><button
+                                        class="delete_book">x</button></a>
+                                <span class="tooltip_text">Delete Book</span>
+                            </div>
+                        </div>
+                        <p class="author">by {{ book.author.name }} <span class="publication_year">on {{
+                                book.publication_year}}</span></p>
+                        <div class="rating">
+                            {% for _ in range(book.rating) %}
+                            <span class="fa fa-star checked"></span>
+                            {% endfor %}
+                            {% for _ in range(5 - book.rating) %}
+                            <span class="fa fa-star"></span>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
     </div>
-
-
-    <div class="books">
-        {% for book in books %}
-        <div class="container book">
-            <h2>{{ book.title}}</h2>
-            <p class="author">Author: {{ book.author.name }}</p>
-            <p class="isbn">ISBN: {{ book.isbn}}</p>
-            <p class="publication_year">Publish Date: {{ book.publication_year}}</p>
-            <img src="{{ book.cover_url }}" alt="Book Cover: {{ book.title }}">
-        </div>
-        {% endfor %}
-    </div>
-
-
 </body>
 
 </html>

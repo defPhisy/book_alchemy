@@ -27,11 +27,13 @@ class Book(db.Model):
     __tablename__ = "books"
 
     book_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    isbn: Mapped[str] = mapped_column(unique=True)
+    isbn: Mapped[int] = mapped_column(unique=True)
     title: Mapped[str]
     publication_year: Mapped[str]
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
-    cover_url: Mapped[str]
+    summary: Mapped[str]
+    img_url: Mapped[str]
+    rating: Mapped[int]
 
     author = relationship("Author", back_populates="books")
 
@@ -43,3 +45,12 @@ class Book(db.Model):
             f"Book ID: {self.book_id}, Title: {self.title}, "
             f"Year: {self.publication_year}, ISBN: {self.isbn}"
         )
+
+    @classmethod
+    def count_books(cls, session):
+        """
+        Returns the total number of books in the database.
+        :param session: The SQLAlchemy session to query the database.
+        :return: Integer count of books.
+        """
+        return session.query(cls).count()
