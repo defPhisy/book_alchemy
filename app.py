@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash
 from data_models import db, Book, Author
 import os
 from datetime import datetime
@@ -9,7 +9,10 @@ DB_NAME = "library.sqlite"
 FULL_DB_PATH = os.path.join(ROOT_PATH, DB_FOLDER, DB_NAME)
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{FULL_DB_PATH}"
+app.config.from_mapping(
+    SQLALCHEMY_DATABASE_URI=f"sqlite:///{FULL_DB_PATH}",
+    SECRET_KEY=os.getenv("SECRET_KEY", "your-default-secret-key"),
+)
 db.init_app(app)
 
 # create db tables based on data_models , called only once for table creation
@@ -19,12 +22,22 @@ with app.app_context():
 
 @app.route("/")
 def index():
-    if request.args:
-        sort = request.args["sort"]
-    else:
-        sort = Book.title
+    sort = Book.title  # default sorting
 
+    if "sort" in request.args:
+        sort = request.args["sort"]
     books = db_get_books(sort)
+
+    if "search" in request.args:
+        search = request.args["search"]
+        search_results = db_search_books(search)
+        print(search_results)
+        if search_results:
+            books = search_results
+        else:
+            error = "No books found!"
+            flash(error)
+
     book_count = Book.count_books(db.session)
     return render_template("home.html", books=books, book_count=book_count)
 
@@ -86,6 +99,15 @@ def db_get_books(sort):
     return (
         db.session.execute(db.select(Book).join(Book.author).order_by(sort_by))
     ).scalars()
+
+
+def db_search_books(search):
+    search = f"%{search.lower()}%"
+    return (
+        (db.session.execute(db.select(Book).where(Book.title.like(search))))
+        .scalars()
+        .all()
+    )
 
 
 def db_get_authors():

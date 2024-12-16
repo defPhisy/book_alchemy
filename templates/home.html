@@ -26,10 +26,27 @@
                 <button type="submit"><i class="fa-solid fa-filter"></i> Apply Filter</button>
             </form>
             <div class="separator"></div>
+            <form class="search" action="/">
+                <input type="text" name="search" id="search" required>
+                <button type="submit">Search</button>
+            </form>
+            <div class="separator"></div>
             <a href="/add_author"><button><i class="fa-solid fa-plus"></i> Add Author</button></a>
             <a href="/add_book"><button><i class="fa-solid fa-plus"></i> Add Book</button></a>
         </nav>
         <main>
+            <!-- Flash Messages Section -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flash-container">
+                {% for message in messages %}
+                <p class="flash">{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- Book Section -->
             <div class="books">
                 {% for book in books %}
                 <div class="book">

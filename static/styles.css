@@ -59,6 +59,7 @@ nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
 }
 
@@ -108,11 +109,16 @@ h1 {
   margin-block-end: 4rem;
 }
 
-.sort {
+.sort,
+.search {
+  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1rem;
   max-width: 25rem;
+  input {
+    margin: 0;
+  }
 }
 
 main {
@@ -274,4 +280,19 @@ button:hover,
 .background-overlay {
   background: linear-gradient(180deg, #03160bae, #151a17 75%);
   min-height: 100vh;
+}
+
+.flash-container {
+  margin-inline: auto;
+  background-color: rgba(255, 0, 0, 0.638);
+  width: fit-content;
+  padding: 1rem 2rem;
+  margin-block: 2rem;
+  border-radius: 0.5 rem;
+  border: 1px solid red;
+
+  .flash {
+    font-weight: bold;
+    color: white;
+  }
 }
